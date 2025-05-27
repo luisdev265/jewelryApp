@@ -2,14 +2,29 @@ import express from "express";
 import dotenv from "dotenv";
 import productosRouter from './admin/routes/product.js'
 import path from 'path';
+import cors from 'cors';
+import { fileURLToPath } from "url";
+import { dirname } from "path";
+
+// Para poder usar __dirname en módulos ES (como import/export)
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = dirname(__filename);
 
 dotenv.config();
+
 
 const app = express();
 const PORT = process.env.PORT || 3000; 
 
+app.use(cors({
+  
+}));
+
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
+
+// Servir la carpeta "uploads" como pública
+app.use('/images', express.static(path.join(__dirname, 'admin', 'models', 'createProduct', 'uploads')));
 
 app.use(
     '/uploads',
@@ -17,12 +32,12 @@ app.use(
   );
   
   // Rutas
-  app.use('/api/productos', productosRouter);
+  app.use('/api/products', productosRouter);
 
 app.get("/", (_req, res) => {
   res.send("¡Servidor funcionando con Express  🚀");
 });
 
-app.listen(PORT, () => {
-  console.log(`Servidor escuchando en http://localhost:${PORT}`);
+app.listen(PORT, "0.0.0.0",() => {
+  console.log(`Servidor escuchando en http://192.168.164.1:${PORT}`);
 });

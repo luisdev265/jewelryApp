@@ -1,0 +1,1 @@
+export type DragAndDropEvent = "dragstart" | "dragleave" | "dragover" | "";

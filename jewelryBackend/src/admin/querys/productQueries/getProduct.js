@@ -4,15 +4,15 @@ import { error } from "../../../utils/throwError.js";
 const getProductsQuery = async () => {
   try {
     const query = `SELECT 
-            p.id AS product_id,
-            p.name AS product_name,
-            p.description AS product_description,
-            p.price AS product_price,
-            p.stock_quantity AS product_stock,
-            c.id AS category_id,
-            c.name AS category_name,
-            s.id AS sub_category_id,
-            s.name AS sub_category_name,
+            p.id AS productId,
+            p.name AS productName,
+            p.description AS productDescription,
+            p.price AS productPrice,
+            p.stock_quantity AS productStock,
+            c.id AS categoryId,
+            c.name AS category,
+            s.id AS sub_categoryId,
+            s.name AS subCategory,
             CONCAT(
                 '[',
                     GROUP_CONCAT(
@@ -23,7 +23,7 @@ const getProductsQuery = async () => {
                         )
                     ),
                 ']'
-            ) AS images_json
+            ) AS imagesJson
         FROM product_images i
         LEFT JOIN products p
         ON i.product_id = p.id

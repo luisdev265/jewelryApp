@@ -12,8 +12,8 @@ const router = express.Router();
 // POST /api/productos -> Crea un producto y guarda sus imágenes
 router.get('/', getProductController);
 router.get('/:id', getProductIdController);
-router.post('/', upload.array('imagenes', 5), createProductController);
-router.patch('/:id', upload.array('imagenes', 5), updateProductController);
-router.delete('/:id', upload.array('imagenes', 5), deleteProductController);
+router.post('/', upload.array('images', 5), createProductController);
+router.patch('/:id', upload.array('images', 5), updateProductController);
+router.delete('/:id', upload.array('images', 5), deleteProductController);
 
 export default router;

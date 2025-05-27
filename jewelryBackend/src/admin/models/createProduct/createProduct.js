@@ -51,7 +51,7 @@ const createProduct = async (productData, files) => {
     if (files && files.length) {
       imageValues = files.map((file) => {
         // Arma la ruta pública de la imagen
-        const relativePath = path.join("/uploads", `${file.filename}`);
+        const relativePath = file.filename;
         return [productId, relativePath];
       });
 

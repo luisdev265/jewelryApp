@@ -1,32 +1,65 @@
 import { error } from "../../utils/throwError.js";
 import updateAll from "../querys/productQueries/updateProduct.js";
-import path from 'path'
+import path from "path";
 
-const updateProductModel = async (productData, productId, files) => {
+const updateProductModel = async (productData, productId, files, images) => {
   try {
-    const { name,
-        price,
-        description,
-        stock,
-        category,
-        subcategory 
+    const {
+      productName,
+      productPrice,
+      productDescription,
+      productStock,
+      category,
+      subcategory,
     } = productData;
 
-    if (!name || !price || !description || !stock || !category || !subcategory || !productId)
-      return error("All Fields Are Required");
+    if (!productId) {
+      return error("Product ID is required.");
+    }
+
+    if (
+      !productName &&
+      !productPrice &&
+      !productDescription &&
+      !productStock &&
+      !category &&
+      !subcategory &&
+      images !== "true"
+    ) {
+      return error("No fields provided to update.");
+    }
+
+    if (images !== "true" && !productData) {
+      return error("Images Are Required");
+    }
+
+    const newPrice = productPrice.split(" ");
+    const priceNumber = parseFloat(newPrice[1]);
+
+    productData.productPrice = priceNumber;
+    console.log(priceNumber);
 
     // 2) Inserta las rutas de las imágenes asociadas
     let imageValues = [];
-    if (files && files.length) {
-      imageValues = files.map((file) => {
-        // Arma la ruta pública de la imagen
-        const relativePath = path.join("/uploads", `${file.filename}`);
-        return [productId, relativePath];
-      });
+
+    if (images === "true") {
+      if (files && files.length) {
+        imageValues = files.map((file) => {
+          console.log(file.filename);
+          // Arma la ruta pública de la imagen
+          const relativePath = path.join(file.filename);
+          return [productId, relativePath];
+        });
+      }
     }
 
-    const resposnes = await updateAll(productData, productId, imageValues );
-
+    const resposnes = await updateAll(
+      productData,
+      productId,
+      imageValues,
+      images
+    );
+    console.log(resposnes);
 
     return resposnes;
   } catch (err) {

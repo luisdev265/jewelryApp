@@ -21,28 +21,34 @@ const storage = multer.diskStorage({
     cb(null, dir);
   },
   filename: (req, file, cb) => {
-    // 2) Si aún no existe, inicializamos el contador en 0
-    if (typeof req.fileIndex === "undefined") {
-      req.fileIndex = 0;
+  if (typeof req.fileIndex === "undefined") {
+    req.fileIndex = 0;
+  }
+  req.fileIndex += 1;
+
+  const { name } = req.body;
+  const { nameImage } = req.query;
+
+  const validName = !name ? nameImage : name;
+  const ext = path.extname(file.originalname);
+  const baseName = `${validName}-${req.fileIndex}`; // sin extensión
+
+  const dir = path.join(__dirname, "uploads");
+  
+  // 👇 Leer todos los archivos en la carpeta
+  const allFiles = fs.readdirSync(dir);
+
+  // 👇 Borrar los que empiecen con el mismo nombre base (sin importar extensión)
+  allFiles.forEach((existingFile) => {
+    if (existingFile.startsWith(baseName)) {
+      const fullPath = path.join(dir, existingFile);
+      fs.unlinkSync(fullPath);
     }
-    // 3) Lo incrementamos por cada archivo
-    req.fileIndex += 1;
+  });
 
-    // 4) Construimos el nombre: name-del-formulario + guión + índice + extensión
-    const { name } = req.body;
-    const ext = path.extname(file.originalname);
-    const fileName = `${name}-${req.fileIndex}${ext}`;
-
-    // Ruta completa del archivo
-    const filePath = path.join(__dirname, "uploads", fileName);
-
-    // Si ya existe un archivo con ese nombre, lo eliminamos
-    if (fs.existsSync(filePath)) {
-      fs.unlinkSync(filePath);
-    }
-
-    cb(null, fileName);
-  },
+  const finalFileName = `${baseName}${ext}`;
+  cb(null, finalFileName);
+}
 });
 
 const upload = multer({ storage: storage });
