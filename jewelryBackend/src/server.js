@@ -5,6 +5,8 @@ import path from 'path';
 import cors from 'cors';
 import { fileURLToPath } from "url";
 import { dirname } from "path";
+import categories from './admin/routes/categories.js'
+import subCategories from './admin/routes/subCategories.js'
 
 // Para poder usar __dirname en módulos ES (como import/export)
 const __filename = fileURLToPath(import.meta.url);
@@ -33,6 +35,8 @@ app.use(
   
   // Rutas
   app.use('/api/products', productosRouter);
+  app.use('/api/categories', categories);
+  app.use('/api/subCategories', subCategories);
 
 app.get("/", (_req, res) => {
   res.send("¡Servidor funcionando con Express  🚀");
