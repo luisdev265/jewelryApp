@@ -7,9 +7,73 @@ import type {
   FormMapProps,
   FormProductProps,
 } from "@/types/formPorduct";
+import type { Category } from "@/types/categories";
+import type { SubCategories } from "@/types/subCategories";
+import { useCallback } from "react";
+import { useEffect } from "react";
 
 const FormMap = (props: FormMapProps) => {
   const { reloadAll } = props;
+  const [categories, setCategories] = useState<Category[]>([]);
+  const [subCategories, setSubCategories] = useState<SubCategories[]>([]);
+  const [LogError, setLogError] = useState<string>("");
+
+  const url = import.meta.env.VITE_API_URL;
+
+  const handleResponse = useCallback(async (): Promise<Category[]> => {
+    try {
+      const response = await fetch(`${url}/api/Categories`, {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+        },
+      });
+
+      if (!response.ok) {
+        console.log("Failed to fetch data");
+      }
+
+      setLogError("");
+
+      const data = await response.json();
+      setCategories(data);
+      console.log(data);
+      return data;
+    } catch (e) {
+      console.log(e);
+      return [];
+    }
+  }, [url]);
+
+  const handleResponseSubCategories = useCallback(async (): Promise<SubCategories[]> => {
+    try {
+      const response = await fetch(`${url}/api/subCategories`, {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+        },
+      });
+
+      if (!response.ok) {
+        setLogError("Failed to fetch data");
+
+      }
+
+      setLogError("");
+      const data = await response.json();
+      setSubCategories(data.subCategories);
+      console.log(data.subCategories);
+      return data;
+    } catch (e) {
+      console.log(e);
+      return [];
+    }
+  }, [url] );
+
+  useEffect(() => {
+    handleResponse();
+    handleResponseSubCategories();
+  }, [handleResponse, handleResponseSubCategories]);
 
   const [dataForm, setDataForm] = useState<FormProductProps>({
     productName: "",
@@ -40,10 +104,18 @@ const FormMap = (props: FormMapProps) => {
       ) {
         formData.append("productDescription", dataForm.productDescription);
       }
-      if (dataForm.productPrice && dataForm.productPrice !== props.productPrice && dataForm.productPrice !== 0) {
+      if (
+        dataForm.productPrice &&
+        dataForm.productPrice !== props.productPrice &&
+        dataForm.productPrice !== 0
+      ) {
         formData.append("productPrice", dataForm.productPrice.toString());
       }
-      if (dataForm.productStock && dataForm.productStock !== props.productStock && dataForm.productStock !== 0) {
+      if (
+        dataForm.productStock &&
+        dataForm.productStock !== props.productStock &&
+        dataForm.productStock !== 0
+      ) {
         formData.append("productStock", dataForm.productStock.toString());
       }
 
@@ -106,6 +178,38 @@ const FormMap = (props: FormMapProps) => {
           </div>
         );
       })}
+      <div className="flex flex-col gap-2">
+      <label htmlFor="Category">Category</label>
+        <select name="category" id="category" className="h-10 rounded-md border px-3 focus:border-gray-400 outline-none hover:cursor-pointer">
+          {LogError ? (
+            <p className="text-red-600 text-lg">Error al optener categorias</p>
+          ) : (
+            categories.map((category) => {
+              return (
+                <option key={category.id} value={category.id}>
+                  {category.name}
+                </option>
+              );
+            })
+          )}
+        </select>
+      </div>
+      <div className="flex flex-col gap-2">
+      <label htmlFor="Subcategory">Subcategory</label>
+        <select name="Subcategory" id="Subcategory" className="h-10 rounded-md border px-3 focus:border-gray-400 outline-none hover:cursor-pointer">
+          {LogError ? (
+            <p className="text-red-600 text-lg">Error al optener categorias</p>
+          ) : (
+            subCategories.map((subcategory) => {
+              return (
+                <option key={subcategory.id} value={subcategory.id}>
+                  {subcategory.name}
+                </option>
+              );
+            })
+          )}
+        </select>
+      </div>
       <DragAndDrop setImages={setImages} />
       <Button className="w-full hover:cursor-pointer bg-green-500 hover:bg-green-600">
         Update

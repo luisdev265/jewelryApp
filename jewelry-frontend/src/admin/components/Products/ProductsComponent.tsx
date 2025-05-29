@@ -45,6 +45,9 @@ export default function ProductsCrud() {
       return [];
     }
   }, [url]);
+
+
+
   useEffect(() => {
     handleResponse();
   }, [handleResponse]);
