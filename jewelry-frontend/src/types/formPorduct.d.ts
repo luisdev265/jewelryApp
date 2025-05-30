@@ -19,6 +19,8 @@ interface ProductMin {
 
 export interface FormMapProps extends ProductMin {
   formFields: FormField[];
+  selectedCategory: number;
+  setSelectedCategory: React.Dispatch<React.SetStateAction<number>>;
   reloadAll: () => Promise<Product[]>;
 }
 

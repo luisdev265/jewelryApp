@@ -17,8 +17,14 @@ const FormMap = (props: FormMapProps) => {
   const [categories, setCategories] = useState<Category[]>([]);
   const [subCategories, setSubCategories] = useState<SubCategories[]>([]);
   const [LogError, setLogError] = useState<string>("");
+  
+  const formFields = props.formFields;
+  const [images, setImages] = useState<File[]>([]);
 
   const url = import.meta.env.VITE_API_URL;
+
+  //handle satate
+  const setCategory = props.setSelectedCategory;
 
   const handleResponse = useCallback(async (): Promise<Category[]> => {
     try {
@@ -84,8 +90,10 @@ const FormMap = (props: FormMapProps) => {
 
   console.log(dataForm.productName);
 
-  const formFields = props.formFields;
-  const [images, setImages] = useState<File[]>([]);
+  const handleSelect = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    const { value } = e.target;
+    setCategory(parseInt(value));
+  }
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -180,7 +188,7 @@ const FormMap = (props: FormMapProps) => {
       })}
       <div className="flex flex-col gap-2">
       <label htmlFor="Category">Category</label>
-        <select name="category" id="category" className="h-10 rounded-md border px-3 focus:border-gray-400 outline-none hover:cursor-pointer">
+        <select name="category" id="category" onChange={handleSelect} className="h-10 rounded-md border px-3 focus:border-gray-400 outline-none hover:cursor-pointer">
           {LogError ? (
             <p className="text-red-600 text-lg">Error al optener categorias</p>
           ) : (
@@ -201,11 +209,13 @@ const FormMap = (props: FormMapProps) => {
             <p className="text-red-600 text-lg">Error al optener categorias</p>
           ) : (
             subCategories.map((subcategory) => {
-              return (
-                <option key={subcategory.id} value={subcategory.id}>
-                  {subcategory.name}
-                </option>
-              );
+              if (subcategory.category_id === props.selectedCategory) {
+                return (
+                  <option key={subcategory.id} value={subcategory.id}>
+                    {subcategory.name}
+                  </option>
+                );
+              }
             })
           )}
         </select>

@@ -1,5 +1,7 @@
 import type { Product } from "@/types/product";
 import FormMap from "../../Forms/FormMap";
+import { useState } from "react";
+import { useEffect } from "react";
 
 interface Props {
   product: Product | null;
@@ -10,8 +12,17 @@ interface Props {
 function EditProductModal({ ...props }: Props) {
   const { reloadAll, ...rest } = props;
   const { product, onClose } = rest;
+  const [selectedCategory, setSelectedCategory] = useState<number>(0);
+
+  useEffect(() => {
+    if (product) {
+      setSelectedCategory(product.categoryId);
+    }
+  }, [product]);
   //Esto lo hacemos con el final de proteger el componente si dada casualidad recibe un null
   if (!product) return null;
+  //Estado para manejar la carga de subcategorias y mostrarlas en el select
+
   // Capitalizar la primera letra de cada palabra del título
   const title = product.productName;
   const titleParts = title.split(" ");
@@ -35,7 +46,7 @@ function EditProductModal({ ...props }: Props) {
       type: "text",
       name: product.productName,
       value: firstWordCapitalized2,
-      field: "productName"
+      field: "productName",
     },
     {
       id: product.productDescription,
@@ -43,7 +54,7 @@ function EditProductModal({ ...props }: Props) {
       type: "text",
       name: product.productDescription,
       value: truncatedDescription,
-      field: "productDescription"
+      field: "productDescription",
     },
     {
       id: `${product.productPrice}`,
@@ -51,8 +62,7 @@ function EditProductModal({ ...props }: Props) {
       type: "text",
       name: ` ${product.productPrice}`,
       value: `$ ${product.productPrice}`,
-      field: "productPrice"
-
+      field: "productPrice",
     },
     {
       id: `${product.productStock}`,
@@ -60,7 +70,7 @@ function EditProductModal({ ...props }: Props) {
       type: "text",
       name: `${product.productStock}`,
       value: `${product.productStock}`,
-      field: "productStock"
+      field: "productStock",
     },
   ];
 
@@ -69,6 +79,8 @@ function EditProductModal({ ...props }: Props) {
       <div className="bg-white rounded-lg p-6 w-full max-w-md shadow-lg relative">
         <h2 className="text-xl font-semibold mb-4">Editar Producto</h2>
         <FormMap
+          setSelectedCategory={setSelectedCategory}
+          selectedCategory={selectedCategory}
           formFields={formFields}
           reloadAll={reloadAll}
           idProduct={product.productId}
