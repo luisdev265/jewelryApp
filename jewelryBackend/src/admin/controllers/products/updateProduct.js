@@ -6,6 +6,7 @@ const updateProductController = async ( req, res ) => {
         const files = req.files;
         const { id } = req.params;
         const { images } = req.query;
+        console.log(productData)
 
         const updateProductFinally = await updateProductModel(productData, id, files, images);
         res.status(200).json({message: "Product Updated Succssesfully", responses: updateProductFinally});

@@ -33,11 +33,17 @@ const updateProductModel = async (productData, productId, files, images) => {
       return error("Images Are Required");
     }
 
-    const newPrice = productPrice.split(" ");
-    const priceNumber = parseFloat(newPrice[1]);
+    // Take Number string with symbol $ and convert to float
+    if (productPrice) {     
+      const newPrice = productPrice.split(" ");
+      const priceNumber = parseFloat(newPrice[1]);
+      productData.productPrice = priceNumber;
+      console.log(priceNumber);
+    }
 
-    productData.productPrice = priceNumber;
-    console.log(priceNumber);
+    //category and subcategory parse to number
+    productData.category = parseInt(category);
+    productData.subcategory = parseInt(subcategory);
 
     // 2) Inserta las rutas de las imágenes asociadas
     let imageValues = [];

@@ -38,7 +38,6 @@ export default function ProductsCrud() {
 
       const product = data.products;
       setProducts(product);
-      console.log(product);
       return data;
     } catch (e) {
       console.log(e);

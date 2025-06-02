@@ -17,6 +17,8 @@ const FormMap = (props: FormMapProps) => {
   const [categories, setCategories] = useState<Category[]>([]);
   const [subCategories, setSubCategories] = useState<SubCategories[]>([]);
   const [LogError, setLogError] = useState<string>("");
+  const [initialCategory, setInitialCategory] = useState<number | undefined>(0);
+  // St5ate to save the subcategory
   
   const formFields = props.formFields;
   const [images, setImages] = useState<File[]>([]);
@@ -43,7 +45,6 @@ const FormMap = (props: FormMapProps) => {
 
       const data = await response.json();
       setCategories(data);
-      console.log(data);
       return data;
     } catch (e) {
       console.log(e);
@@ -68,7 +69,6 @@ const FormMap = (props: FormMapProps) => {
       setLogError("");
       const data = await response.json();
       setSubCategories(data.subCategories);
-      console.log(data.subCategories);
       return data;
     } catch (e) {
       console.log(e);
@@ -77,27 +77,50 @@ const FormMap = (props: FormMapProps) => {
   }, [url] );
 
   useEffect(() => {
-    handleResponse();
-    handleResponseSubCategories();
-  }, [handleResponse, handleResponseSubCategories]);
+    const fetchData = async () => {
+      try {
+        const cate = await handleResponse();
+        await handleResponseSubCategories();
+
+        if (cate.length > 0) {
+          const firstCategoryId = cate[0].id;
+          setInitialCategory(firstCategoryId);
+          setDataForm(prev => ({
+            ...prev,
+            categoryId: firstCategoryId,
+          }));
+          setCategory(firstCategoryId);
+        }
+      } catch (e) {
+        console.log(e);
+      }
+    };
+    fetchData();
+  }, [handleResponse, handleResponseSubCategories, setCategory]);
 
   const [dataForm, setDataForm] = useState<FormProductProps>({
     productName: "",
     productDescription: "",
     productPrice: 0,
     productStock: 0,
+    categoryId: 0,
+    subCategoryId: 0,
   });
-
-  console.log(dataForm.productName);
 
   const handleSelect = (e: React.ChangeEvent<HTMLSelectElement>) => {
     const { value } = e.target;
     setCategory(parseInt(value));
+    setDataForm({
+      ...dataForm,
+      categoryId: parseInt(value),
+    });
+    console.log(dataForm);
   }
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     try {
+      console.log(props.selectedCategory);
       const formData = new FormData();
       for (let i = 0; i < images.length; i++) {
         formData.append("images", images[i]);
@@ -125,6 +148,12 @@ const FormMap = (props: FormMapProps) => {
         dataForm.productStock !== 0
       ) {
         formData.append("productStock", dataForm.productStock.toString());
+      }
+      if (dataForm.categoryId && dataForm.categoryId !== initialCategory && dataForm.categoryId !== 0) {
+        formData.append("category", dataForm.categoryId.toString());
+      }
+      if (dataForm.subCategoryId && dataForm.subCategoryId !== props.selectedCategory && dataForm.subCategoryId !== 0) {
+        formData.append("subcategory", dataForm.subCategoryId.toString());
       }
 
       console.log(dataForm); // Aquí puedes enviar el formData al servidor para procesar el formulario
@@ -155,6 +184,12 @@ const FormMap = (props: FormMapProps) => {
       }
 
       reloadAll();
+
+      // Seteamos el estado de la categoria inicial por la categoria nueva mandada en el formulario
+      if (dataForm.categoryId !== initialCategory && dataForm.categoryId !== 0) {
+        setInitialCategory(dataForm.categoryId);
+        console.log(dataForm.categoryId);
+      }
 
       const data = res.json();
       return data;
@@ -204,7 +239,13 @@ const FormMap = (props: FormMapProps) => {
       </div>
       <div className="flex flex-col gap-2">
       <label htmlFor="Subcategory">Subcategory</label>
-        <select name="Subcategory" id="Subcategory" className="h-10 rounded-md border px-3 focus:border-gray-400 outline-none hover:cursor-pointer">
+        <select name="Subcategory" id="Subcategory" onChange={(e: React.ChangeEvent<HTMLSelectElement>) => {
+          const { value } = e.target;
+          setDataForm({
+            ...dataForm,
+            subCategoryId: parseInt(value),
+          });
+        }} className="h-10 rounded-md border px-3 focus:border-gray-400 outline-none hover:cursor-pointer">
           {LogError ? (
             <p className="text-red-600 text-lg">Error al optener categorias</p>
           ) : (

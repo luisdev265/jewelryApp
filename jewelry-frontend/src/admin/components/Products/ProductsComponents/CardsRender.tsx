@@ -28,7 +28,6 @@ const CardsRender = ({ ...props }: CardsRenderProps) => {
         const urls2 = urlObject.map(
           (url: urls) => `${imageServerUrl}${url.img_url}`
         );
-        console.log(urls2[0]); // array de url
 
 
         // Truncar la descripción para mostrar solo 10 palabras

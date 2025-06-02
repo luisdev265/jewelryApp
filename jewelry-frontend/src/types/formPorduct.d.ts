@@ -29,4 +29,6 @@ export interface FormProductProps {
   productDescription: string | undefined,
   productPrice: number | undefined,
   productStock: number | undefined,
+  categoryId: number | undefined,
+  subCategoryId: number | undefined,
 }
