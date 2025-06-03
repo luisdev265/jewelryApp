@@ -18,8 +18,11 @@ const FormMap = (props: FormMapProps) => {
   const [subCategories, setSubCategories] = useState<SubCategories[]>([]);
   const [LogError, setLogError] = useState<string>("");
   const [initialCategory, setInitialCategory] = useState<number | undefined>(0);
-  // St5ate to save the subcategory
-  
+  // State to save the subcategory
+  const [initialSubcategory, setInitialSubcategory] = useState<
+    number | undefined
+  >(0);
+
   const formFields = props.formFields;
   const [images, setImages] = useState<File[]>([]);
 
@@ -52,7 +55,9 @@ const FormMap = (props: FormMapProps) => {
     }
   }, [url]);
 
-  const handleResponseSubCategories = useCallback(async (): Promise<SubCategories[]> => {
+  const handleResponseSubCategories = useCallback(async (): Promise<
+    SubCategories[]
+  > => {
     try {
       const response = await fetch(`${url}/api/subCategories`, {
         method: "GET",
@@ -63,33 +68,45 @@ const FormMap = (props: FormMapProps) => {
 
       if (!response.ok) {
         setLogError("Failed to fetch data");
-
       }
 
       setLogError("");
       const data = await response.json();
       setSubCategories(data.subCategories);
-      return data;
+      return data.subCategories;
     } catch (e) {
       console.log(e);
       return [];
     }
-  }, [url] );
+  }, [url]);
 
   useEffect(() => {
     const fetchData = async () => {
       try {
         const cate = await handleResponse();
-        await handleResponseSubCategories();
+        const subcate = await handleResponseSubCategories();
 
         if (cate.length > 0) {
           const firstCategoryId = cate[0].id;
           setInitialCategory(firstCategoryId);
-          setDataForm(prev => ({
+          setDataForm((prev) => ({
             ...prev,
             categoryId: firstCategoryId,
           }));
           setCategory(firstCategoryId);
+        }
+
+        if (cate.length > 0 && subcate.length > 0) {
+          const firstCategoryId = cate[0].id;
+          subcate.forEach((subcategory) => {
+            if (subcategory.category_id === firstCategoryId) {
+              setDataForm((prev) => ({
+                ...prev,
+                subCategoryId: subcategory.id,
+              }));
+              setInitialSubcategory(subcategory.id);
+            }
+          });
         }
       } catch (e) {
         console.log(e);
@@ -108,14 +125,24 @@ const FormMap = (props: FormMapProps) => {
   });
 
   const handleSelect = (e: React.ChangeEvent<HTMLSelectElement>) => {
-    const { value } = e.target;
-    setCategory(parseInt(value));
-    setDataForm({
+    const value = parseInt(e.target.value);
+    setCategory(value);
+
+    const updatedForm = {
       ...dataForm,
-      categoryId: parseInt(value),
-    });
-    console.log(dataForm);
-  }
+      categoryId: value,
+    };
+
+    const subcategory = subCategories.find((sub) => sub.category_id === value);
+
+    if (subcategory) {
+      updatedForm.subCategoryId = subcategory.id;
+    }
+
+    setDataForm(updatedForm);
+
+    console.log(updatedForm); // Acá sí ves los valores actualizados
+  };
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -149,10 +176,19 @@ const FormMap = (props: FormMapProps) => {
       ) {
         formData.append("productStock", dataForm.productStock.toString());
       }
-      if (dataForm.categoryId && dataForm.categoryId !== initialCategory && dataForm.categoryId !== 0) {
+      if (
+        dataForm.categoryId &&
+        (dataForm.subCategoryId !== initialSubcategory || dataForm.categoryId !== initialCategory) &&
+        dataForm.categoryId !== 0
+      ) {
         formData.append("category", dataForm.categoryId.toString());
       }
-      if (dataForm.subCategoryId && dataForm.subCategoryId !== props.selectedCategory && dataForm.subCategoryId !== 0) {
+      if (
+        dataForm.subCategoryId &&
+        (dataForm.categoryId !== initialCategory ||
+          dataForm.subCategoryId !== initialSubcategory) &&
+        dataForm.subCategoryId !== 0
+      ) {
         formData.append("subcategory", dataForm.subCategoryId.toString());
       }
 
@@ -186,9 +222,16 @@ const FormMap = (props: FormMapProps) => {
       reloadAll();
 
       // Seteamos el estado de la categoria inicial por la categoria nueva mandada en el formulario
-      if (dataForm.categoryId !== initialCategory && dataForm.categoryId !== 0) {
+      if (
+        dataForm.categoryId !== initialCategory &&
+        dataForm.categoryId !== 0
+      ) {
         setInitialCategory(dataForm.categoryId);
-        console.log(dataForm.categoryId);
+      }
+
+      // Seteamos el estado de la subcategoria inicial por la subcategoria nueva mandada en el formulario
+      if ( dataForm.subCategoryId !== initialSubcategory && dataForm.subCategoryId !== 0) {
+        setInitialSubcategory(dataForm.subCategoryId);
       }
 
       const data = res.json();
@@ -222,8 +265,13 @@ const FormMap = (props: FormMapProps) => {
         );
       })}
       <div className="flex flex-col gap-2">
-      <label htmlFor="Category">Category</label>
-        <select name="category" id="category" onChange={handleSelect} className="h-10 rounded-md border px-3 focus:border-gray-400 outline-none hover:cursor-pointer">
+        <label htmlFor="Category">Category</label>
+        <select
+          name="category"
+          id="category"
+          onChange={handleSelect}
+          className="h-10 rounded-md border px-3 focus:border-gray-400 outline-none hover:cursor-pointer"
+        >
           {LogError ? (
             <p className="text-red-600 text-lg">Error al optener categorias</p>
           ) : (
@@ -238,14 +286,19 @@ const FormMap = (props: FormMapProps) => {
         </select>
       </div>
       <div className="flex flex-col gap-2">
-      <label htmlFor="Subcategory">Subcategory</label>
-        <select name="Subcategory" id="Subcategory" onChange={(e: React.ChangeEvent<HTMLSelectElement>) => {
-          const { value } = e.target;
-          setDataForm({
-            ...dataForm,
-            subCategoryId: parseInt(value),
-          });
-        }} className="h-10 rounded-md border px-3 focus:border-gray-400 outline-none hover:cursor-pointer">
+        <label htmlFor="Subcategory">Subcategory</label>
+        <select
+          name="Subcategory"
+          id="Subcategory"
+          onChange={(e: React.ChangeEvent<HTMLSelectElement>) => {
+            const { value } = e.target;
+            setDataForm({
+              ...dataForm,
+              subCategoryId: parseInt(value),
+            });
+          }}
+          className="h-10 rounded-md border px-3 focus:border-gray-400 outline-none hover:cursor-pointer"
+        >
           {LogError ? (
             <p className="text-red-600 text-lg">Error al optener categorias</p>
           ) : (
