@@ -1,0 +1,1 @@
+export type ModalState = "Editar" | "Eliminar" | "Crear"

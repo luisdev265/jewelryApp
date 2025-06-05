@@ -43,5 +43,5 @@ app.get("/", (_req, res) => {
 });
 
 app.listen(PORT, "0.0.0.0",() => {
-  console.log(`Servidor escuchando en http://192.168.164.1:${PORT}`);
+  console.log(`Servidor escuchando en http://192.168.1.64:${PORT}`);
 });

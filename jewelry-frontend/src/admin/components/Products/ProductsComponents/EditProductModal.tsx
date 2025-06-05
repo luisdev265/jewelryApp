@@ -76,7 +76,7 @@ function EditProductModal({ ...props }: Props) {
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50">
-      <div className="bg-white rounded-lg p-6 w-full max-w-md shadow-lg relative">
+      <div className="bg-white rounded-lg p-6 w-full max-w-md shadow-lg relative max-h-[500px] overflow-y-auto ">
         <h2 className="text-xl font-semibold mb-4">Editar Producto</h2>
         <FormMap
           setSelectedCategory={setSelectedCategory}

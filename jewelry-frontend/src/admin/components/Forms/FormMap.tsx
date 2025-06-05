@@ -19,9 +19,7 @@ const FormMap = (props: FormMapProps) => {
   const [LogError, setLogError] = useState<string>("");
   const [initialCategory, setInitialCategory] = useState<number | undefined>(0);
   // State to save the subcategory
-  const [initialSubcategory, setInitialSubcategory] = useState<
-    number | undefined
-  >(0);
+  const [initialSubcategory, setInitialSubcategory] = useState<number | undefined>(0);
 
   const formFields = props.formFields;
   const [images, setImages] = useState<File[]>([]);
@@ -178,7 +176,8 @@ const FormMap = (props: FormMapProps) => {
       }
       if (
         dataForm.categoryId &&
-        (dataForm.subCategoryId !== initialSubcategory || dataForm.categoryId !== initialCategory) &&
+        (dataForm.subCategoryId !== initialSubcategory ||
+          dataForm.categoryId !== initialCategory) &&
         dataForm.categoryId !== 0
       ) {
         formData.append("category", dataForm.categoryId.toString());
@@ -230,7 +229,10 @@ const FormMap = (props: FormMapProps) => {
       }
 
       // Seteamos el estado de la subcategoria inicial por la subcategoria nueva mandada en el formulario
-      if ( dataForm.subCategoryId !== initialSubcategory && dataForm.subCategoryId !== 0) {
+      if (
+        dataForm.subCategoryId !== initialSubcategory &&
+        dataForm.subCategoryId !== 0
+      ) {
         setInitialSubcategory(dataForm.subCategoryId);
       }
 

@@ -24,7 +24,7 @@ interface CardProps {
 export default function Cards({ ...props }: CardProps) {
   return (
     <Card className="flex flex-col pt-0">
-      <img src={props.img} alt={props.alt} className="rounded-t-lg" />
+      <img src={props.img} alt={props.alt} className="rounded-t-lg w-[300px]" />
       <CardHeader className="w-full flex-1">
         <CardTitle className="text-lg">{props.title}</CardTitle>
         <CardDescription>{props.description}</CardDescription>

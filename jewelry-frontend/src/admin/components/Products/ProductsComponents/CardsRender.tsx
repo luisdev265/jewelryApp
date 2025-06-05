@@ -29,19 +29,22 @@ const CardsRender = ({ ...props }: CardsRenderProps) => {
           (url: urls) => `${imageServerUrl}${url.img_url}`
         );
 
-
         // Truncar la descripción para mostrar solo 10 palabras
         const description = product.productDescription;
         const descriptionParts = description.split(" ");
         const firstWord = descriptionParts[0];
         // Agregar la primera letra mayúscula a la primera palabra de la descripcion
-        descriptionParts[0] = firstWord.charAt(0).toUpperCase() + firstWord.slice(1);
-        const truncatedDescription = descriptionParts.slice(0, 10).join(" ") + "...";
+        descriptionParts[0] =
+          firstWord.charAt(0).toUpperCase() + firstWord.slice(1);
+        const truncatedDescription =
+          descriptionParts.slice(0, 10).join(" ") + "...";
 
         // Capitalizar la primera letra de cada palabra del título
         const title = product.productName;
         const titleParts = title.split(" ");
-        const firstWordCapitalized = titleParts.map((word) => word.charAt(0).toUpperCase() + word.slice(1)); // capitalizamos la primera letra de cada palabra y las unimo
+        const firstWordCapitalized = titleParts.map(
+          (word) => word.charAt(0).toUpperCase() + word.slice(1)
+        ); // capitalizamos la primera letra de cada palabra y las unimo
         const firstWordCapitalized2 = firstWordCapitalized.join(" "); // unimos las palabras
 
         return (
